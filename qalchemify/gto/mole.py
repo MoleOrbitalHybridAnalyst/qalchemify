@@ -51,6 +51,10 @@ def merged_mol_generator(molA, molB, singleA, singleB, dualA, dualB,
             returns the force constant for restraining dualA atoms
         geom_res_fc_dualB (Callable):
             returns the force constant for restraining dualB atoms
+        geom_dualA_pred:
+            predict dualA atom positions given shared coordinates
+        geom_dualB_pred:
+            predict dualB atom positions given shared coordinates
 
     Returns:
         a function that returns a merged mol given lambda

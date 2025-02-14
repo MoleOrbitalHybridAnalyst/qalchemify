@@ -5,16 +5,60 @@ def merged_scf_generator(SCF, molA, molB, singleA, singleB, dualA, dualB,
             vorb_molA=None, vorb_molB=None,
             geom_res_fc_dualA=None, geom_res_fc_dualB=None,
             geom_dualA_pred=None, geom_dualB_pred=None):
-    r'''
+    r''' Build a merged mean-field object with interpolated Hamiltonian.
 
     Args:
-        sigma (Callable):
-        geom_res_fc_dualA:
-        geom_res_fc_dualB:
+        molA:
+            mol when lambda = 0.0
+        molB:
+            mol when lambda = 1.0
+        singleA (List):
+            coordinate shared atom indices in molA
+        singleB (List):
+            coordinate shared atom indices in molB
+        dualA (List):
+            unique atom indices in molA
+        dualB (List):
+            unique atom indices in molB
+        has_grad (bool):
+            if True, switching functions, vorb, geom_res_fc, sigma expected to return the lambda gradient
+             when taking an extra argument return_grad, while geom_pred expected to return the nuc gradient
+        fsw_nelectron (Callable):
+            switching function that controls nelectron given lambda.
+            expect fsw(0.0), fsw(1.0) = 1.0, 0.0
+            nelectron(l) = nelectronA * fsw(l) + nelectronB * (1 - fsw(l))
+        fsw_spin (Callable):
+            switching function that controls spin given lambda
+            expect fsw(0.0), fsw(1.0) = 1.0, 0.0
+        fsw_ham_single (Callable):
+            switching function that controls alchemical transition between coordinate shared atoms.
+            expect fsw(0.0), fsw(1.0) = 1.0, 0.0
+            for those atoms, H = HA * fsw(l) + HB * (1 - fsw(l))
+        fsw_ham_dualA (Callable):
+            switching function that controls the annihilation of dualA atoms.
+            expect fsw(0.0), fsw(1.0) = 1.0, 0.0
+            for dualA atoms, H = HA * fsw(l)
+        fsw_ham_dualB (Callable):
+            switching function that controls the annihilation of dualB atoms.
+            expect fsw(0.0), fsw(1.0) = 1.0, 0.0
+            for dualB atoms, H = HB * (1 - fsw(l))
+        vorb_molA (Callable):
+            returns the potential on ghost orbitals of molA atoms given lambda
+        vorb_molB (Callable):
+            returns the potential on ghost orbitals of molB atoms given lambda
+        geom_res_fc_dualA (Callable):
+            returns the force constant for restraining dualA atoms
+        geom_res_fc_dualB (Callable):
+            returns the force constant for restraining dualB atoms
         geom_dualA_pred:
             predict dualA atom positions given shared coordinates
         geom_dualB_pred:
             predict dualB atom positions given shared coordinates
+        sigma (Callable):
+            returns the electronic temperature given lambda
+
+    Returns:
+        a function that returns a merged mf given lambda
     '''
     from qalchemify.gto.mole import merged_mol_generator
     from pyscf.scf import uhf, ghf
