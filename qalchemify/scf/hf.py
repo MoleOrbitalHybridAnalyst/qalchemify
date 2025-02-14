@@ -201,7 +201,6 @@ def merged_scf_generator(SCF, molA, molB, singleA, singleB, dualA, dualB,
         mf.get_hcore_lgrad = types.MethodType(get_hcore_lgrad, mf)
         if do_smearing:
             mf.get_occ = types.MethodType(get_occ, mf)
-#        mf.energy_nuc = types.MethodTypes(energy_nuc, mf)
         mf.energy_tot = types.MethodType(energy_tot, mf)
         mf.nuc_grad_method = types.MethodType(nuc_grad_method, mf)
         mf.energy_tot_lgrad = types.MethodType(energy_tot_lgrad, mf)
