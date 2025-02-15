@@ -50,8 +50,12 @@ def geom_pred(x, return_grad=False):
     else:
         return center
 
+def rhf(mol):
+    mf = scf.hf.RHF(mol)
+    mf.init_guess = '1e'                                                                  # interpolation makes default minao guess makes less sense, use 1e instead
+    return mf
 mfgen = merged_scf_generator(
-        scf.hf.RHF,                                                                       # will create a restricted Hartree Fock object
+        rhf,                                                                              # will create a restricted Hartree Fock object
         molA, molB,                                                                       # molA -> molB when lambda = 0 -> 1
         [0,1,2],                                                                          # indices of molA atoms whose coords will be shared with molB
         [0,1,2],                                                                          # indices of molB atoms whose coords will be shared with molA
@@ -78,7 +82,6 @@ e0 = mf0.kernel()
 mf0grad = mf0.nuc_grad_method()
 gradR0 = mf0grad.kernel()
 mf = mfgen(0.0)
-mf.init_guess = '1e'                                                                      # interpolation makes default minao guess makes less sense, use 1e instead
 e = mf.kernel() - mf.mol.energy_geom_res()
 mfgrad = mf.nuc_grad_method()
 gradR = mfgrad.kernel() - mf.mol.grad_geom_res()                                          # subtract the geometric restraint energy which is absent in a regular water
@@ -92,7 +95,6 @@ e1 = mf1.kernel()
 mf1grad = mf1.nuc_grad_method()
 gradR1 = mf1grad.kernel()
 mf = mfgen(1.0)
-mf.init_guess = '1e'                                                                      # interpolation makes default minao guess makes less sense, use 1e instead
 e = mf.kernel()
 mfgrad = mf.nuc_grad_method()
 gradR = mfgrad.kernel()
@@ -107,6 +109,5 @@ def check_lambda_gradient(l0):
 check_lambda_gradient(1.00)
 check_lambda_gradient(0.95)
 check_lambda_gradient(0.50)
-check_lambda_gradient(1.00)
 check_lambda_gradient(0.05)
 check_lambda_gradient(0.00)
